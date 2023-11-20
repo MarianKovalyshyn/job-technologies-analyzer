@@ -1,3 +1,4 @@
+import csv
 import json
 
 
@@ -14,7 +15,7 @@ def count_technologies_in_job_description(
             technologies_count[technology] += 1
 
 
-def read_file(
+def read_json_file(
     file_path: str,
     possible_technologies: list[str],
 ) -> dict[str, int]:
@@ -33,3 +34,15 @@ def read_file(
         )
 
     return technologies_count
+
+
+def write_csv_file(technologies_counted: dict[str, int]):
+    with open("technologies_count.csv", "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=["technology", "count"])
+        writer.writeheader()
+        writer.writerows(
+            [
+                {"technology": technology, "count": count}
+                for technology, count in technologies_counted.items()
+            ]
+        )
