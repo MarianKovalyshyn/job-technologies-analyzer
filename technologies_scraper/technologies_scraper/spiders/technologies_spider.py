@@ -69,6 +69,7 @@ class TechnologiesSpider(scrapy.Spider):
                 'return document.readyState == "complete"'
             )
         )
+        time.sleep(1)
         html_content = self.driver.page_source
         selector = Selector(text=html_content)
         job_description = selector.css("#description-wrap").get()
@@ -82,7 +83,10 @@ class TechnologiesSpider(scrapy.Spider):
             )
         )
 
-        if self.driver.find_element(By.CSS_SELECTOR, "h3.santa-typo-h3").text == "За вашим запитом поки немає вакансій":
+        if (
+            self.driver.find_element(By.CSS_SELECTOR, "h3.santa-typo-h3").text
+            == "За вашим запитом поки немає вакансій"
+        ):
             raise CloseSpider("No jobs found")
 
         self.scroll_to_bottom(self.driver)
