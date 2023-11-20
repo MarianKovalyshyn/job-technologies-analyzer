@@ -1,6 +1,7 @@
 import time
 
 import scrapy
+from scrapy.exceptions import CloseSpider
 from scrapy.http import Response
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -16,27 +17,45 @@ class TechnologiesSpider(scrapy.Spider):
         self.driver = webdriver.Chrome()
 
     def parse(self, response: Response, **kwargs):
-        # for vacancy_detail_link in response.css("a.ng-tns-c224-29"):
-        #     yield response.follow(vacancy_detail_link, callback=self.parse_vacancy_detail)
+        page_number = 0
 
-        self.driver.get(response.url)
+        while True:
+            page_number += 1
+            page_link = self.start_urls[0] + f"?page={page_number}"
+            yield from self.parse_single_page(page_link)
+
+    def parse_single_page(self, page_link: str):
+        self.driver.get(page_link)
+
+        if (self.driver.find_elements(By.CSS_SELECTOR, "h3.santa-typo-h3")[0]
+                .text == "За вашим запитом поки немає вакансій"):
+            raise CloseSpider("Condition met")
+
         self.scroll_to_bottom(speed=10)
 
-        for job_title in self.driver.find_elements(By.CSS_SELECTOR, "h2.santa-typo-h3"):
-            yield {"job_title": job_title.text}
+        for job_card in self.driver.find_elements(
+            By.CSS_SELECTOR, "div.santa--mb-20"
+        ):
+            yield {
+                "job_title": job_card.find_element(
+                    By.CSS_SELECTOR, "h2.santa-typo-h3"
+                ).text,
+                "link": job_card.find_element(By.CSS_SELECTOR, "a.santa-mb-20")
+                .get_attribute("href"),
+            }
 
-    @staticmethod
-    def parse_vacancy_detail(response: Response, **kwargs):
-        yield {
-            "title": response.css("h1.santa-typo-h3::text").get(),
-        }
-
-    def closed(self):
+    def closed(self) -> None:
         self.driver.quit()
 
-    def scroll_to_bottom(self, speed=1):
-        time.sleep(5)
-        total_height = self.driver.execute_script("return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);")
+    def scroll_to_bottom(self, speed: int = 1) -> None:
+        time.sleep(7)
+        total_height = self.driver.execute_script(
+            "return Math.max(document.body.scrollHeight, "
+            "document.body.offsetHeight, "
+            "document.documentElement.clientHeight, "
+            "document.documentElement.scrollHeight, "
+            "document.documentElement.offsetHeight);"
+        )
         prev_height = 0
 
         while True:
@@ -46,7 +65,13 @@ class TechnologiesSpider(scrapy.Spider):
                 self.driver.execute_script("window.scrollTo(0, {});".format(i))
                 time.sleep(0.1)
 
-            current_height = self.driver.execute_script("return Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);")
+            current_height = self.driver.execute_script(
+                "return Math.max(document.body.scrollHeight, "
+                "document.body.offsetHeight, "
+                "document.documentElement.clientHeight, "
+                "document.documentElement.scrollHeight, "
+                "document.documentElement.offsetHeight);"
+            )
 
             if current_height == total_height:
                 break
@@ -54,4 +79,4 @@ class TechnologiesSpider(scrapy.Spider):
             prev_height = total_height
             total_height = current_height
 
-        time.sleep(1)
+        time.sleep(2)
