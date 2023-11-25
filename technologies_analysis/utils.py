@@ -56,4 +56,6 @@ def visualize_technologies(
     plt.xlabel("Technology")
     plt.ylabel("Count")
     plt.tight_layout()
-    plt.savefig(f"plots/{experience_level.lower()}_technologies_({date.today()}).png")
+    plt.savefig(
+        f"plots/{experience_level.lower()}_technologies_({date.today()}).png"
+    )

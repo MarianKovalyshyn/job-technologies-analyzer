@@ -6,7 +6,7 @@ from technologies_analysis.utils import (
     visualize_technologies,
 )
 
-vacancies_df = pd.read_csv("vacancies.csv")
+vacancies_df = pd.read_csv("technologies_scraper/vacancies.csv")
 vacancies_df = add_experience_column(vacancies_df)
 
 
