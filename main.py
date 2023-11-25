@@ -1,7 +1,7 @@
-from technologies_scraper.technologies_scraper.utils import get_data
-from technologies_visualization.utils import visualize_data
+import pandas as pd
 
+from technologies_analysis.utils import add_experience_column
 
-file_path = "technologies_scraper/technologies.json"
-get_data(file_path=file_path)
-visualize_data()
+vacancies_df = pd.read_json("vacancies.json")
+vacancies_df = add_experience_column(vacancies_df)
+print(vacancies_df.head())
