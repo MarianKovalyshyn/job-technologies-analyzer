@@ -1,15 +1,17 @@
+from datetime import date
+
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 
-from config import possible_technologies
+from config import possible_technologies, experience_levels
 
 
 def add_experience_column(data_frame: pd.DataFrame) -> pd.DataFrame:
-    data_frame["experience"] = "Junior"
-    experience_levels = ["Middle", "Senior"]
+    default_level, all_levels = experience_levels[0], experience_levels[1:]
+    data_frame["experience"] = default_level
 
-    for experience_level in experience_levels:
+    for experience_level in all_levels:
         data_frame["experience"] = np.where(
             (
                 data_frame["job_title"].str.contains(
@@ -54,4 +56,4 @@ def visualize_technologies(
     plt.xlabel("Technology")
     plt.ylabel("Count")
     plt.tight_layout()
-    plt.savefig(f"plots/{experience_level.lower()}_technologies.png")
+    plt.savefig(f"plots/{experience_level.lower()}_technologies_({date.today()}).png")
