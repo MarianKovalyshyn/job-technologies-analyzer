@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
+from matplotlib import pyplot as plt
 
 from config import possible_technologies
 
 
 def add_experience_column(data_frame: pd.DataFrame) -> pd.DataFrame:
     data_frame["experience"] = "Junior"
-    experience_levels = ["Middle", "Senior", "Lead"]
+    experience_levels = ["Middle", "Senior"]
 
     for experience_level in experience_levels:
         data_frame["experience"] = np.where(
@@ -25,12 +26,12 @@ def add_experience_column(data_frame: pd.DataFrame) -> pd.DataFrame:
 def count_technologies(
     experience_level: str, data_frame: pd.DataFrame
 ) -> pd.DataFrame:
-    df_junior = data_frame[data_frame["experience"] == experience_level]
+    data_frame = data_frame[data_frame["experience"] == experience_level]
     count_of_technologies = pd.DataFrame(columns=["technology", "count"])
 
     for technology in possible_technologies:
         count = (
-            df_junior["job_description"]
+            data_frame["job_description"]
             .str.contains(technology, case=False)
             .sum()
         )
@@ -40,3 +41,17 @@ def count_technologies(
         }
 
     return count_of_technologies
+
+
+def visualize_technologies(
+    vacancies_df: pd.DataFrame, experience_level: str
+) -> None:
+    technologies = count_technologies(experience_level, vacancies_df)
+    technologies.sort_values(by="count", ascending=False)[:10].plot.bar(
+        x="technology", y="count", rot=45
+    )
+    plt.title(f"Top 10 technologies for {experience_level} Python Developer")
+    plt.xlabel("Technology")
+    plt.ylabel("Count")
+    plt.tight_layout()
+    plt.savefig(f"plots/{experience_level.lower()}_technologies.png")
