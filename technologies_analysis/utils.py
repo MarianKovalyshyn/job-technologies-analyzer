@@ -46,7 +46,7 @@ def count_technologies(
     return count_of_technologies
 
 
-def visualize_technologies(
+def visualize_technologies_bar_plot(
     vacancies_df: pd.DataFrame, experience_level: str
 ) -> None:
     technologies = count_technologies(experience_level, vacancies_df)
@@ -58,5 +58,21 @@ def visualize_technologies(
     plt.ylabel("Count")
     plt.tight_layout()
     plt.savefig(
-        f"plots/{experience_level.lower()}_technologies_({date.today()}).png"
+        f"plots/{experience_level.lower()}_top10_technologies_bar_plot_({date.today()}).png"
+    )
+
+
+def visualize_technologies_pie_chart(
+    vacancies_df: pd.DataFrame, experience_level: str
+) -> None:
+    technologies = count_technologies(experience_level, vacancies_df)
+    sorted_technologies = technologies.sort_values(
+        by="count", ascending=False
+    )[:10]
+    sorted_technologies.plot.pie(
+        y="count", legend=False, labels=sorted_technologies["technology"], autopct="%1.1f%%"
+    )
+    plt.title(f"Top 10 technologies for {experience_level} Python Developer")
+    plt.savefig(
+        f"plots/{experience_level.lower()}_top10_technologies_pie_chart_({date.today()}).png"
     )
