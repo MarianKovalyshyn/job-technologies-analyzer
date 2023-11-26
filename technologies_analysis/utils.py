@@ -28,6 +28,7 @@ def add_experience_column(data_frame: pd.DataFrame) -> pd.DataFrame:
 def count_technologies(
     experience_level: str, data_frame: pd.DataFrame
 ) -> pd.DataFrame:
+    data_frame = add_experience_column(data_frame)
     data_frame = data_frame[data_frame["experience"] == experience_level]
     count_of_technologies = pd.DataFrame(columns=["technology", "count"])
 
