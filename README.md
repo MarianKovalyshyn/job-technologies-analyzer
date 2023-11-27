@@ -5,6 +5,10 @@ This is an app to analyze most demanded technologies in job vacancies for differ
 You can run a scraper to parse vacancies. 
 After scraping, you can visualize data on the 2 types of diagrams: bar plot and pie chart.
 
+### Additional info
+* All visualizations are saved in the `plots` folder.
+* In config.py you can set different experience levels and technologies to analyze.
+
 ## Installing using GitHub
 Python should be installed
 
